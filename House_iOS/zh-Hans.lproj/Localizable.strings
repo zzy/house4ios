@@ -1,0 +1,28 @@
+/* 
+  Localizable.strings
+  House_iOS
+
+  Created by Zhongyu Zhang on 11-11-28.
+  Copyright (c) 2011年 OUDS. All rights reserved.
+*/
+
+"sys_info"="系统提示";
+"login_info"="登录提示";
+"login_input"="用户名、密码为必填项！\n";
+"i_know"="知道了";
+"proj_select"="请先选择项目！\n";
+"okay"="确定";
+"cancel"="取消";
+"config"="设置";
+"back"="返回";
+"network_exception"="网络连接异常，请检查网络！\n";
+"data_info"="数据提示";
+"empty_data"="无数据！\n";
+"all_buildings" = "显示全部房源";
+"sale_buildings" = "显示可售房源";
+
+"for_sale" = "可售";
+"contracting" = "拟定合同";
+"contracted" = "已签合同";
+"not_sale" = "非售";
+"in_order" = "订购";

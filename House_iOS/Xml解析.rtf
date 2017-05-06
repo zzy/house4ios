@@ -1,0 +1,163 @@
+{\rtf1\ansi\ansicpg936\cocoartf1138\cocoasubrtf230
+{\fonttbl\f0\fnil\fcharset0 Menlo-Regular;\f1\fnil\fcharset134 STHeitiSC-Light;}
+{\colortbl;\red255\green255\blue255;\red100\green56\blue32;\red196\green26\blue22;\red170\green13\blue145;
+\red28\green0\blue207;\red0\green116\blue0;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11300\viewh9160\viewkind0
+\deftab560
+\pard\tx560\pardeftab560\pardirnatural
+
+\f0\fs22 \cf2 \CocoaLigature0 #import \cf3 <Foundation/Foundation.h>\cf2 \
+\cf0 \
+\
+\cf4 @interface\cf0  XmlParser : NSObject \{\
+    \
+\}\
+\
+\cf4 @property\cf0  (\cf4 nonatomic\cf0 , \cf4 retain\cf0 )NSString *objName;\
+\cf4 @property\cf0  \cf4 BOOL\cf0  *isList;\
+\cf4 @property\cf0  (\cf4 nonatomic\cf0 , \cf4 retain\cf0 ) NSMutableString *currentResult;\
+\cf4 @property\cf0  (\cf4 nonatomic\cf0 , \cf4 retain\cf0 ) NSMutableDictionary *map;\
+\cf4 @property\cf0  (\cf4 nonatomic\cf0 , \cf4 retain\cf0 ) NSMutableArray *list;\
+\
+-(NSMutableDictionary *)getObject:(NSString *)elName xmlData:(NSData *)xmlData;\
+-(NSMutableArray *)getList:(NSString *)elName xmlData:(NSData *)xmlData;\
+\
+\cf4 @end\cf0 \
+\
+\
+\cf2 #import \cf3 "XmlResolve.h"\cf2 \
+\cf0 \
+\
+\cf4 @implementation\cf0  XmlParser\
+\
+\cf4 @synthesize\cf0  objName;\
+\cf4 @synthesize\cf0  isList;\
+\cf4 @synthesize\cf0  currentResult;\
+\cf4 @synthesize\cf0  map;\
+\cf4 @synthesize\cf0  list;\
+\
+- (\cf4 void\cf0 )dealloc\
+\{\
+    [objName release];\
+    [currentResult release];\
+    [map release];\
+    [list release];\
+    isList = \cf4 nil\cf0 ;\
+    [\cf4 super\cf0  dealloc];\
+\}\
+\
+-(NSMutableDictionary *)getObject:(NSString *)elName xmlData:(NSData *)xmlData\
+\{\
+    \cf4 self\cf0 .objName = elName;\
+    \cf4 self\cf0 .isList = \cf4 NO\cf0 ;\
+    NSXMLParser *xmlRead = [[NSXMLParser alloc] initWithData:xmlData];\
+    [xmlRead setDelegate:\cf4 self\cf0 ];\
+    [xmlRead parse];\
+    [xmlRead release];\
+    \cf4 return\cf0  map;\
+\}\
+\
+-(NSMutableArray *)getList:(NSString *)elName xmlData:(NSData *)xmlData\
+\{\
+    \cf4 self\cf0 .objName = elName;\
+    \cf4 self\cf0 .isList = \cf4 YES\cf0 ;\
+    \cf4 self\cf0 .currentResult = [[NSMutableString alloc] init];\
+    \cf4 self\cf0 .list = [[NSMutableArray alloc]init];\
+    NSXMLParser *xmlRead = [[NSXMLParser alloc] initWithData:xmlData];\
+    [xmlRead setDelegate:\cf4 self\cf0 ];\
+    [xmlRead parse];\
+    [xmlRead release];\
+    \cf4 if\cf0  ([list count]>\cf5 0\cf0 ) \{\
+        \cf4 return\cf0  list;\
+    \}\
+    \cf4 return\cf0  \cf4 nil\cf0 ;\
+\}\
+\
+- (\cf4 void\cf0 )parser:(NSXMLParser *)parser foundCharacters:(NSString *)string\
+\{\
+    \
+    NSString *text = [string stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];\
+    \cf4 if\cf0  (text==\cf4 nil\cf0 ||[text isEqualToString:\cf3 @""\cf0 ]||[text isEqualToString:\cf3 @"\\n"\cf0 ]) \{\
+        \cf4 self\cf0 .currentResult = \cf4 nil\cf0 ;\
+    \}\cf4 else\cf0 \{\
+        \cf4 self\cf0 .currentResult = [[[NSMutableString alloc] init]autorelease];\
+        [\cf4 self\cf0 .currentResult appendString:text];\
+    \}\
+    [text release];\
+\}\
+\
+- (\cf4 void\cf0 )parser:(NSXMLParser *)parser didEndElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName\
+\{\
+    \cf4 if\cf0  (currentResult!=\cf4 nil\cf0 ) \{\
+        \cf4 if\cf0  (map!=\cf4 nil\cf0 ) \{\
+            [map setObject:currentResult forKey:elementName];\
+        \}\
+    \}\
+\}\
+\
+- (\cf4 void\cf0 )parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName attributes:(NSDictionary *)attributeDict\
+\{\
+    \
+    \cf4 if\cf0  ([elementName isEqualToString:objName]) \{\
+        map = [[[NSMutableDictionary alloc]init]autorelease];\
+        \cf4 if\cf0 (isList&&list!=\cf4 nil\cf0 &&map!=\cf4 nil\cf0 )\{\
+            [list addObject:map];\
+        \}\
+    \}\cf4 else\cf0 \{\
+        \
+    \}\
+    \
+\}\
+\
+\pard\tx560\pardeftab560\pardirnatural
+\cf6 /*\
+ XML *xml = [[XML alloc]init];\
+ \
+ NSString *path = [[NSBundle mainBundle] pathForResource:@"test1" ofType:@"xml"];//
+\f1 \'b5\'c3\'b5\'bd
+\f0 xml
+\f1 \'ce\'c4\'bc\'fe\'c2\'b7\'be\'b6
+\f0 \
+ NSFileHandle *file = [NSFileHandle fileHandleForReadingAtPath:path];//
+\f1 \'b5\'c3\'b5\'bd
+\f0 xml
+\f1 \'ce\'c4\'bc\'fe
+\f0 \
+ NSData *data = [file readDataToEndOfFile];//
+\f1 \'b6\'c1\'c8\'a1\'b5\'bd
+\f0 nsdata
+\f1 \'d6\'d0
+\f0 \
+ [file closeFile];\
+ NSMutableDictionary *map = [xml getObject:@"book1" xmlData:data];\
+ NSLog(@"%@",[map objectForKey:@"author"]);\
+ [data release];\
+ [xml release];\
+ \
+ path = [[NSBundle mainBundle] pathForResource:@"test2" ofType:@"xml"];//
+\f1 \'b5\'c3\'b5\'bd
+\f0 xml
+\f1 \'ce\'c4\'bc\'fe\'c2\'b7\'be\'b6
+\f0 \
+ file = [NSFileHandle fileHandleForReadingAtPath:path];//
+\f1 \'b5\'c3\'b5\'bd
+\f0 xml
+\f1 \'ce\'c4\'bc\'fe
+\f0 \
+ data = [file readDataToEndOfFile];//
+\f1 \'b6\'c1\'c8\'a1\'b5\'bd
+\f0 nsdata
+\f1 \'d6\'d0
+\f0 \
+ NSMutableArray *list = [xml getList:@"book1" xmlData:data];\
+ for (int i=0;i<[list count];i++) \{\
+ NSMutableDictionary *map = [list objectAtIndex:i];\
+ NSLog(@"%@",[map objectForKey:@"author"]);\
+ \}\
+ [data release];\
+ [xml release];\
+ */\cf0 \
+ \
+\pard\tx560\pardeftab560\pardirnatural
+\cf4 @end\cf0 \
+}
